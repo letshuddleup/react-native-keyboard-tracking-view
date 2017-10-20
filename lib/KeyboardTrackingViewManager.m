@@ -169,8 +169,10 @@ typedef NS_ENUM(NSUInteger, KeyboardTrackingScrollBehavior) {
 
         if(_manageScrollView)
         {
+            NSLog(@"Manage enabled");
             if(_scrollViewToManage == nil)
             {
+                NSLog(@"Seeing a new scroll view");
                 if(_requiresSameParentToManageScrollView && [subview isKindOfClass:[RCTScrollView class]] && subview.superview == self.superview)
                 {
                     _scrollViewToManage = ((RCTScrollView*)subview).scrollView;
