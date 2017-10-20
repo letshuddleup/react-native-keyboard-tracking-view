@@ -166,6 +166,7 @@ typedef NS_ENUM(NSUInteger, KeyboardTrackingScrollBehavior) {
     NSMutableArray<RCTScrollView*>* rctScrollViewsArray = [NSMutableArray array];
 
     for (UIView* subview in allSubviews) {
+      NSLog(@"Manage not enabled");
 
         if(_manageScrollView)
         {
@@ -226,7 +227,6 @@ typedef NS_ENUM(NSUInteger, KeyboardTrackingScrollBehavior) {
         {
             [scrollView removeScrollListener:self];
             [scrollView addScrollListener:self];
-            NSLog(@"Hooking up the scroll view");
             break;
         }
     }
@@ -298,7 +298,6 @@ typedef NS_ENUM(NSUInteger, KeyboardTrackingScrollBehavior) {
         for (UIView *n in current.subviews)
         {
             [allSubviews addObject:n];
-            NSLog(@"inserting a potential scroll view");
             [queue insertObject:n atIndex:0];
         }
     }
