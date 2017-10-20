@@ -166,6 +166,9 @@ typedef NS_ENUM(NSUInteger, KeyboardTrackingScrollBehavior) {
     NSMutableArray<RCTScrollView*>* rctScrollViewsArray = [NSMutableArray array];
 
     for (UIView* subview in allSubviews) {
+        if(_manageScrollView)
+        {
+
         if(_scrollViewToManage == nil)
         {
             NSLog(@"Seeing a new scroll view");
@@ -189,6 +192,7 @@ typedef NS_ENUM(NSUInteger, KeyboardTrackingScrollBehavior) {
         {
             [rctScrollViewsArray addObject:(RCTScrollView*)subview];
             NSLog(@"Add scroll view to array");
+        }
         }
 
         if ([subview isKindOfClass:[RCTTextField class]])
@@ -322,7 +326,6 @@ typedef NS_ENUM(NSUInteger, KeyboardTrackingScrollBehavior) {
         if(self.scrollIsInverted)
         {
             insets.top = bottomInset;
-            NSLog(@"Inverting the inset");
         }
         else
         {
@@ -330,7 +333,7 @@ typedef NS_ENUM(NSUInteger, KeyboardTrackingScrollBehavior) {
         }
         self.scrollViewToManage.contentInset = insets;
 
-        if(self.scrollBehavior == KeyboardTrackingScrollBehaviorScrollToBottomInvertedOnly && _scrollIsInverted)
+        if(self.scrollBehavior == KeyboardTrackingScrollBehaviorScrollToBottomInvertedOnly)
         {
             BOOL fisrtTime = [ObservingInputAccessoryView sharedInstance].keyboardHeight == 0 && [ObservingInputAccessoryView sharedInstance].keyboardState == KeyboardStateHidden;
             BOOL willOpen = [ObservingInputAccessoryView sharedInstance].keyboardHeight != 0 && [ObservingInputAccessoryView sharedInstance].keyboardState == KeyboardStateHidden;
