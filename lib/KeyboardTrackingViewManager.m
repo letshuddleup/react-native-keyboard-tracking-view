@@ -326,21 +326,23 @@ typedef NS_ENUM(NSUInteger, KeyboardTrackingScrollBehavior) {
         if(self.scrollIsInverted)
         {
             insets.top = bottomInset;
+            NSLog(@"Updating top insert");
         }
         else
         {
             insets.bottom = bottomInset;
+            NSLog(@"Updating bottom insert");
         }
         self.scrollViewToManage.contentInset = insets;
 
         if(self.scrollBehavior == KeyboardTrackingScrollBehaviorScrollToBottomInvertedOnly)
         {
-            BOOL fisrtTime = [ObservingInputAccessoryView sharedInstance].keyboardHeight == 0 && [ObservingInputAccessoryView sharedInstance].keyboardState == KeyboardStateHidden;
+            BOOL firstTime = [ObservingInputAccessoryView sharedInstance].keyboardHeight == 0 && [ObservingInputAccessoryView sharedInstance].keyboardState == KeyboardStateHidden;
             BOOL willOpen = [ObservingInputAccessoryView sharedInstance].keyboardHeight != 0 && [ObservingInputAccessoryView sharedInstance].keyboardState == KeyboardStateHidden;
             BOOL isOpen = [ObservingInputAccessoryView sharedInstance].keyboardHeight != 0 && [ObservingInputAccessoryView sharedInstance].keyboardState == KeyboardStateShown;
-            if(fisrtTime || willOpen || (isOpen && !self.isDraggingScrollView))
+            if(firstTime || willOpen || (isOpen && !self.isDraggingScrollView))
             {
-                [self.scrollViewToManage setContentOffset:CGPointMake(self.scrollViewToManage.contentOffset.x, -self.scrollViewToManage.contentInset.top) animated:!fisrtTime];
+                [self.scrollViewToManage setContentOffset:CGPointMake(self.scrollViewToManage.contentOffset.x, -self.scrollViewToManage.contentInset.top) animated:!firstTime];
                 NSLog(@"Setting offset");
             }
         }
