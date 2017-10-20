@@ -166,35 +166,29 @@ typedef NS_ENUM(NSUInteger, KeyboardTrackingScrollBehavior) {
     NSMutableArray<RCTScrollView*>* rctScrollViewsArray = [NSMutableArray array];
 
     for (UIView* subview in allSubviews) {
-      NSLog(@"Manage not enabled");
-
-        if(_manageScrollView)
+        if(_scrollViewToManage == nil)
         {
-            NSLog(@"Manage enabled");
-            if(_scrollViewToManage == nil)
+            NSLog(@"Seeing a new scroll view");
+            if(_requiresSameParentToManageScrollView && [subview isKindOfClass:[RCTScrollView class]] && subview.superview == self.superview)
             {
-                NSLog(@"Seeing a new scroll view");
-                if(_requiresSameParentToManageScrollView && [subview isKindOfClass:[RCTScrollView class]] && subview.superview == self.superview)
-                {
-                    _scrollViewToManage = ((RCTScrollView*)subview).scrollView;
-                    NSLog(@"Connecting a scroll view");
-                }
-                else if([subview isKindOfClass:[UIScrollView class]])
-                {
-                    _scrollViewToManage = (UIScrollView*)subview;
-                }
-
-                if(_scrollViewToManage != nil)
-                {
-                    _scrollIsInverted = CGAffineTransformEqualToTransform(_scrollViewToManage.superview.transform, CGAffineTransformMakeScale(1, -1));
-                }
+                _scrollViewToManage = ((RCTScrollView*)subview).scrollView;
+                NSLog(@"Connecting a scroll view");
+            }
+            else if([subview isKindOfClass:[UIScrollView class]])
+            {
+                _scrollViewToManage = (UIScrollView*)subview;
             }
 
-            if([subview isKindOfClass:[RCTScrollView class]])
+            if(_scrollViewToManage != nil)
             {
-                [rctScrollViewsArray addObject:(RCTScrollView*)subview];
-                NSLog(@"Add scroll view to array");
+                _scrollIsInverted = CGAffineTransformEqualToTransform(_scrollViewToManage.superview.transform, CGAffineTransformMakeScale(1, -1));
             }
+        }
+
+        if([subview isKindOfClass:[RCTScrollView class]])
+        {
+            [rctScrollViewsArray addObject:(RCTScrollView*)subview];
+            NSLog(@"Add scroll view to array");
         }
 
         if ([subview isKindOfClass:[RCTTextField class]])
