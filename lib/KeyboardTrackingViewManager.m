@@ -58,8 +58,21 @@
 #import "UIView+React.h"
 #endif
 
+#if __has_include(<React/RCTTextInput.h>)
+#import <React/RCTTextInput.h>
+#else
+#import "RCTTextInput.h"
+#endif
+
 #import <objc/runtime.h>
 
+
+#define UNFUCK_REACT YES
+
+void __swizzle_invalidateInputAccessoryView(id self, SEL _cmd)
+{
+    // And do nothing
+}
 
 NSUInteger const kInputViewKey = 101010;
 NSUInteger const kMaxDeferedInitializeAccessoryViews = 15;
@@ -94,6 +107,15 @@ typedef NS_ENUM(NSUInteger, KeyboardTrackingScrollBehavior) {
 @end
 
 @implementation KeyboardTrackingView
+
++(void)initialize {
+    [super initialize];
+    if (UNFUCK_REACT) {
+        Method method = class_getInstanceMethod([RCTTextInput class], @selector(invalidateInputAccessoryView));
+        IMP swizzleImp = (IMP)__swizzle_invalidateInputAccessoryView;
+        method_setImplementation(method, swizzleImp);
+    }
+}
 
 -(instancetype)init
 {
@@ -197,7 +219,7 @@ typedef NS_ENUM(NSUInteger, KeyboardTrackingScrollBehavior) {
             [(RCTUITextField*)[(RCTTextField*)subview backedTextInputView] setInputAccessoryView:[ObservingInputAccessoryView sharedInstance]];
             [(RCTUITextField*)[(RCTTextField*)subview backedTextInputView] reloadInputViews];
             
-            [_inputViewsMap setObject:subview forKey:@(kInputViewKey)];
+            [_inputViewsMap setObject:[(RCTTextField*)subview backedTextInputView] forKey:@(kInputViewKey)];
         }
         else if ([subview isKindOfClass:[RCTTextView class]])
         {
@@ -206,7 +228,6 @@ typedef NS_ENUM(NSUInteger, KeyboardTrackingScrollBehavior) {
             {
                 [textView setInputAccessoryView:[ObservingInputAccessoryView sharedInstance]];
                 [textView reloadInputViews];
-                
                 [_inputViewsMap setObject:textView forKey:@(kInputViewKey)];
             }
         }
