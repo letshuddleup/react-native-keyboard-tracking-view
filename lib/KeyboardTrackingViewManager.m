@@ -51,6 +51,7 @@ typedef NS_ENUM(NSUInteger, KeyboardTrackingScrollBehavior) {
 @property (nonatomic) BOOL addBottomView;
 @property (nonatomic) BOOL scrollToFocusedInput;
 @property (nonatomic) BOOL allowHitsOutsideBounds;
+@property (nonatomic) NSUInteger dynamicBottomPadding;
 
 @end
 
@@ -409,7 +410,11 @@ typedef NS_ENUM(NSUInteger, KeyboardTrackingScrollBehavior) {
             BOOL isOpen = _observingInputAccessoryView.keyboardHeight != 0 && _observingInputAccessoryView.keyboardState == KeyboardStateShown;
             if(firstTime || willOpen || (isOpen && !self.isDraggingScrollView))
             {
-                [self.scrollViewToManage setContentOffset:CGPointMake(self.scrollViewToManage.contentOffset.x, -self.scrollViewToManage.contentInset.top) animated:!firstTime];
+                CGFloat dynamicOffset = 0;
+                if(willOpen) {
+                    dynamicOffset = self.dynamicBottomPadding;
+                }
+                [self.scrollViewToManage setContentOffset:CGPointMake(self.scrollViewToManage.contentOffset.x, -self.scrollViewToManage.contentInset.top + dynamicOffset) animated:!firstTime];
             }
         }
         else if(self.scrollBehavior == KeyboardTrackingScrollBehaviorFixedOffset && !self.isDraggingScrollView)
@@ -630,6 +635,7 @@ RCT_REMAP_VIEW_PROPERTY(requiresSameParentToManageScrollView, requiresSameParent
 RCT_REMAP_VIEW_PROPERTY(addBottomView, addBottomView, BOOL)
 RCT_REMAP_VIEW_PROPERTY(scrollToFocusedInput, scrollToFocusedInput, BOOL)
 RCT_REMAP_VIEW_PROPERTY(allowHitsOutsideBounds, allowHitsOutsideBounds, BOOL)
+RCT_REMAP_VIEW_PROPERTY(dynamicBottomPadding, dynamicBottomPadding, NSUInteger)
 
 - (NSDictionary<NSString *, id> *)constantsToExport
 {
