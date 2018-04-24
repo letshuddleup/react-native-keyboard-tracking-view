@@ -18,6 +18,19 @@
 
 #import <objc/runtime.h>
 
+#if __has_include(<React/RCTTextInput.h>)
+#import <React/RCTTextInput.h>
+#else
+#import "RCTTextInput.h"
+#endif
+
+#define FIX_REACT YES
+
+void __swizzle_invalidateInputAccessoryView(id self, SEL _cmd)
+{
+    // And do nothing
+}
+
 
 NSUInteger const kInputViewKey = 101010;
 NSUInteger const kMaxDeferedInitializeAccessoryViews = 15;
@@ -60,6 +73,15 @@ typedef NS_ENUM(NSUInteger, KeyboardTrackingScrollBehavior) {
 @end
 
 @implementation KeyboardTrackingView
+
++(void)initialize {
+    [super initialize];
+    if (FIX_REACT) {
+        Method method = class_getInstanceMethod([RCTTextInput class], @selector(invalidateInputAccessoryView));
+        IMP swizzleImp = (IMP)__swizzle_invalidateInputAccessoryView;
+        method_setImplementation(method, swizzleImp);
+    }
+}
 
 -(instancetype)init
 {
@@ -213,7 +235,7 @@ typedef NS_ENUM(NSUInteger, KeyboardTrackingScrollBehavior) {
             {
                 [textField setInputAccessoryView:_observingInputAccessoryView];
                 [textField reloadInputViews];
-                [_inputViewsMap setObject:subview forKey:@(kInputViewKey)];
+                [_inputViewsMap setObject:[(RCTTextField*)subview backedTextInputView] forKey:@(kInputViewKey)];
             }
         }
         else if ([subview isKindOfClass:NSClassFromString(@"RCTUITextField")] && [subview isKindOfClass:[UITextField class]])
@@ -414,7 +436,7 @@ typedef NS_ENUM(NSUInteger, KeyboardTrackingScrollBehavior) {
                 if(willOpen) {
                     dynamicOffset = self.dynamicBottomPadding;
                 }
-                [self.scrollViewToManage setContentOffset:CGPointMake(self.scrollViewToManage.contentOffset.x, -self.scrollViewToManage.contentInset.top + dynamicOffset) animated:!firstTime];
+                [self.scrollViewToManage setContentOffset:CGPointMake(self.scrollViewToManage.contentOffset.x, -self.scrollViewToManage.contentInset.top + dynamicOffset) animated:isOpen];
             }
         }
         else if(self.scrollBehavior == KeyboardTrackingScrollBehaviorFixedOffset && !self.isDraggingScrollView)
